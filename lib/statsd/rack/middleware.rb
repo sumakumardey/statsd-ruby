@@ -12,31 +12,29 @@ module Statsd
       end
 
       def call(env)
-        k = generate_key(env)
-        if k.nil?
-          self.call_without_timer(env)
-        else
-          self.call_with_timer(k, env)
-        end
-      end
+        # Call and measure request time
+        before = Time.now
+        response = @app.call(env)
+        response_time = Time.now - before
 
-      def call_without_timer(env)
-        @app.call(env)
-      end
-
-      def call_with_timer(key, env)
+        # Generate key for logging
+        key = generate_key(env)
         @statsd.increment(key + ".requests")
-        @statsd.time(key + ".render") do
-          @app.call(env)
-        end
+        @statsd.timing(key + ".render", response_time)
+
+        # Pass the response down the stack
+        response
       end
 
       def generate_key(env)
-        s = env['PATH_INFO']
-        puts(s)
-        return nil if s.nil?
-        s = (s == '/' ? 'index' : s.downcase.scan(/[a-z_-]+/).join('.'))
-        (s.nil? || s.empty? ? nil : s)
+        if params = env['action_controller.request.path_parameters']
+          return 'unknown_route' unless params["controller"]
+          params['controller'] + '.' + params['action']
+        elsif s = env['PATH_INFO']
+          s = (s == '/' ? 'index' : s.downcase.scan(/[a-z][a-z1-9_-]+/).join('.'))
+          (s.nil? || s.empty? ? nil : s)
+        end
+
       end
 
     end
