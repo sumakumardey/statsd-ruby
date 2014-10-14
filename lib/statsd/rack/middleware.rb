@@ -21,7 +21,7 @@ module Statsd
         key = generate_key(env)
         key_host = generate_host(env)
         @statsd.increment(key + ".requests")
-        @statsd.increment(key_host + ".requests")
+        @statsd.increment(key+"."+key_host + ".requests")
         @statsd.timing(key + ".render", (response_time * 1000).to_i )
 
         # Pass the response down the stack
