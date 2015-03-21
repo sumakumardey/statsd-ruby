@@ -20,11 +20,12 @@ module Statsd
         # Generate key for logging
         key = generate_key(env)
         key_host = generate_host(env)
-        @statsd.increment(key + ".requests")
-        @statsd.increment(key+"."+key_host + ".requests")
-        @statsd.timing(key + ".render", (response_time * 1000).to_i )
-        @statsd.timing(key + "." + key_host + ".render", (response_time * 1000).to_i )
-
+        if key 
+          @statsd.increment(key + ".requests")
+          @statsd.increment(key+"."+key_host + ".requests")
+          @statsd.timing(key + ".render", (response_time * 1000).to_i )
+          @statsd.timing(key + "." + key_host + ".render", (response_time * 1000).to_i )
+        end
         # Pass the response down the stack
         response
       end
