@@ -31,7 +31,7 @@ module Statsd
       end
 
       def generate_key(env)
-        if params = env['action_controller.request.path_parameters']
+        if params = env["action_dispatch.request.path_parameters"]
           return 'unknown_route' unless params["controller"]
           params['controller'] + '.' + params['action']
         elsif s = env['PATH_INFO']
