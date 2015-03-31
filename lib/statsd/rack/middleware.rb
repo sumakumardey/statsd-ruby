@@ -35,10 +35,9 @@ module Statsd
           return 'unknown_route' unless params[:controller]
           params[:controller].to_s + '.' + params[:action].to_s
         elsif s = env['PATH_INFO']
-          s = (s == '/' ? 'index' : s.downcase.scan(/[a-z][a-z1-9_-]+/).join('.'))
-          (s.nil? || s.empty? ? nil : s)
+          # If the controller and action is not found then add the key to the unknown route
+          return "unknown_route"
         end
-
       end
 
       def generate_host(env)
