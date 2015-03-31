@@ -34,7 +34,8 @@ module Statsd
         if params = env["action_dispatch.request.path_parameters"]
           return 'unknown_route' unless params[:controller]
           params[:controller].to_s + '.' + params[:action].to_s
-        elsif s = env['PATH_INFO']
+        # elsif s = env['PATH_INFO']
+        else  
           # If the controller and action is not found then add the key to the unknown route
           return "unknown_route"
         end
